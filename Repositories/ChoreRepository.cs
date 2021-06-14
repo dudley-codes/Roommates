@@ -21,13 +21,44 @@ namespace Roommates.Repositories
                 {
                     cmd.CommandText = @"INSERT INTO Chore(Name)
                                         OUTPUT INSERTED.Id
-                                        VALUES @name";
+                                        VALUES (@name)";
                     cmd.Parameters.AddWithValue("@name", chore.Name);
+                    int id = (int)cmd.ExecuteScalar();
+
+                    chore.Id = id;
                 }
             }
         }
         // Get Chore by Id
+        public Chore GetById(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT Name FROM Chore WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@id", id);
+                    SqlDataReader reader = cmd.ExecuteReader();
 
+                    Chore chore = null;
+
+                    if(reader.Read())
+                    {
+                        chore = new Chore
+                        {
+                            Id = id,
+                            Name = reader.GetString(reader.GetOrdinal("Name"))
+                        };
+                    }
+
+                    reader.Close();
+
+                    return chore;
+                }
+
+            }
+        }
         // Get a list of all Chores in the database
         public List<Chore> GetAll()
         {
