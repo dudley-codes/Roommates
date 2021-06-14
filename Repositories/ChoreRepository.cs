@@ -11,6 +11,44 @@ namespace Roommates.Repositories
         // </summary>
         public ChoreRepository(string connectionString) : base(connectionString) { }
 
+        public List<Chore> GetUnnasignedChores()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    //SQL query returns list of chores with NULL as name for unnasigned chores
+                    cmd.CommandText = @"SELECT c.Name AS ChoreName, c.Id AS Id
+                                        FROM Chore c
+                                        LEFT JOIN RoommateChore rc ON rc.ChoreId = c.Id
+                                        LEFT JOIN Roommate r ON rc.RoommateId = r.Id
+                                        WHERE FirstName IS NULL;";
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    //create empty list to hold unnasigned chores
+                    List<Chore> unnasignedChores = new List<Chore>();
+
+                    while (reader.Read())
+                    {
+                        int idValue = reader.GetInt32(reader.GetOrdinal("Id"));
+                        string choreName = reader.GetString(reader.GetOrdinal("ChoreName"));
+
+                        Chore chore = new Chore
+                        {
+                            Id = idValue,
+                            Name = choreName
+                        };
+                        unnasignedChores.Add(chore);
+                    }
+                    reader.Close();
+
+                    return unnasignedChores;
+                }
+            }
+        }
+
         // Create a new Chore
         public void Insert(Chore chore)
         {
