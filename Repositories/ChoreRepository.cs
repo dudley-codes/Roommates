@@ -43,7 +43,7 @@ namespace Roommates.Repositories
 
                     Chore chore = null;
 
-                    if(reader.Read())
+                    if (reader.Read())
                     {
                         chore = new Chore
                         {
@@ -66,7 +66,7 @@ namespace Roommates.Repositories
             {
                 conn.Open();
 
-                using(SqlCommand cmd = conn.CreateCommand())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
                     // Here we set up the command with the SQL we want to execute before we execute it.
                     cmd.CommandText = "SELECT Id, Name FROM Chore";
@@ -78,7 +78,7 @@ namespace Roommates.Repositories
                     List<Chore> chores = new List<Chore>();
 
                     //Read() will return true if there's more data to read
-                    while(reader.Read())
+                    while (reader.Read())
                     {
                         // The "ordinal" is the numeric position of the column in the query results.
                         //  For our query, "Id" has an ordinal value of 0 and "Name" is 1.
